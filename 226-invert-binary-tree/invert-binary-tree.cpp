@@ -18,10 +18,8 @@ public:
         TreeNode* ab = root->left;
         root->left = root->right;
         root->right = ab;
-        if(root->left != NULL)
-            invert(root->left);
-        if(root->right != NULL)
-            invert(root->right);
+        invert(root->left);
+        invert(root->right);
         }
     }
     

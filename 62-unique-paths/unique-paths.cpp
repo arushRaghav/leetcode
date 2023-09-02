@@ -1,16 +1,7 @@
 class Solution {
 public:
     
-    vector<vector<int>> pos;
-    void ini(int m , int n)
-    {
-        vector<int> temp(n,-1);
-        for(int j = 0;j<m;j++)
-        {
-            pos.push_back(temp);
-        }
-    }
-    int pa(int m,int n)
+    int pa(int m,int n ,vector<vector<int>>& pos)
     {
         if(pos[m-1][n-1] >= 0 )
         {
@@ -31,13 +22,13 @@ public:
         }
         else
         {
-            pos[m-1][n-1] = pa(m-1,n) + pa(m,n-1);
+            pos[m-1][n-1] = pa(m-1,n,pos) + pa(m,n-1,pos);
             return pos[m-1][n-1];
         }
     }
 
     int uniquePaths(int m, int n) {
-        ini(m,n);
-        return pa(m,n);
+        vector<vector<int>> pos(m,vector<int>(n,-1));
+        return pa(m,n,pos);
     }
 };

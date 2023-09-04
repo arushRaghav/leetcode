@@ -2,10 +2,6 @@ class Solution {
 public:
     int sum = 0; 
     void helper(TreeNode* rt, int n){
-    
-    if(rt == NULL){
-    return;
-    }
     n = (n*10) + rt->val;
 
     if(rt->left == NULL && rt->right == NULL){
@@ -13,8 +9,10 @@ public:
     return;
     }
  
-    helper(rt->left, n);
-    helper(rt->right, n);
+    if(rt->left)
+        helper(rt->left, n);
+    if(rt->right)
+        helper(rt->right, n);
     }
 
 

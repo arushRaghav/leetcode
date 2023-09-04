@@ -12,24 +12,29 @@
 class Solution {
 public:
     bool hasPathSum(TreeNode* root, int targetSum) {
-        if(root != NULL)
+        if(root == NULL)
+            return false;
+        queue<pair<TreeNode* , int>> qu;
+        qu.push(make_pair(root,root->val));
+
+        while(!qu.empty())
         {
-            if(root->val == targetSum && root->left == NULL && root->right == NULL )
-                return true;
-            
-            else if(root->val != targetSum && root->left == NULL && root->right == NULL)
-                return false;
-            else if( root->left != NULL && root->right != NULL )
-                return hasPathSum( root->left , targetSum - root->val ) || hasPathSum(root->right , targetSum - root->val);
-            
-            else if(root->left == NULL)
-                return hasPathSum(root->right , targetSum - root->val);
-            
-            else
-                return hasPathSum(root->left , targetSum - root->val);
+            int size = qu.size();
+            for(int i = 0;i<size;i++)
+            {
+                TreeNode* node = qu.front().first;
+                int su = qu.front().second;
+                qu.pop();
+
+                if(node->left)
+                    qu.push( {node->left , node->left->val + su} );
+                if(node->right)
+                    qu.push( {node->right , node->right->val + su} );
+                if(!node->left && !node->right && su == targetSum)
+                    return true;
+            }
         }
 
-        else
-            return false;
+        return false;
     }
 };

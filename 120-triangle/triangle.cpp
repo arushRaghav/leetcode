@@ -1,18 +1,25 @@
 class Solution {
 public:
-    
-    int mnt(vector<vector<int>>& tri , int i , int lev , vector<vector<int>>& ch )
-    {
-        if(ch[lev][i]>INT_MIN)
-            return ch[lev][i];
-        if(lev == tri.size()-1)
-            return tri[lev][i];
-        ch[lev][i] = tri[lev][i] + min( mnt(tri , i , lev + 1 ,ch) , mnt(tri , i + 1 , lev + 1,ch) );
-        return ch[lev][i];
-    }
-    
     int minimumTotal(vector<vector<int>>& triangle) {
-        vector<vector<int>> ch(triangle.size(),vector<int>(triangle.size(),INT_MIN));
-        return mnt(triangle , 0,0 , ch);
+        int m=triangle.size(), prev, ans=INT_MAX;
+        if(m==1) return triangle[0][0];
+        vector<int> dp(m, 0);
+        for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<i+1;j++)
+            {
+                if(i==0 && j==0) dp[j]=prev=triangle[i][j];
+                else
+                {
+                    int up=INT_MAX,uleft=INT_MAX;
+                    if(j<i) up=dp[j];
+                    if(j>0) uleft=prev;
+                    prev=up;
+                    dp[j]=min(up, uleft)+triangle[i][j];
+                    if(i==m-1) ans=min(dp[j], ans);
+                }
+            }
+        }
+        return ans;
     }
 };

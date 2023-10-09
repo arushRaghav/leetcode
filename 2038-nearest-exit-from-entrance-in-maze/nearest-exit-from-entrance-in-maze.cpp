@@ -1,58 +1,43 @@
 class Solution {
 public:
+    int nearestExit(vector<vector<char>>& maze, vector<int>& e) {
+        int n = maze.size();
+        int m = maze[0].size();
 
-    struct Node{
-        int x , y , dist;
-    };
-    bool isValid(vector <vector <char>> &arr , vector <vector <bool>> &vis , int i , int j , int m , int n){
-        if (i >= 0 and i < n and j >= 0 and j < m and !vis[i][j] and arr[i][j] == '.'){
-            return true;
-        }
-        return false;
-    }
-    int nearestExit(vector<vector<char>>& arr, vector<int>& en) {
-        int n = arr.size();
-        int m = arr[0].size();
-        vector <vector <bool>> vis(n , vector <bool> (m ,false));
-        int dx[] = {1 , 0 , -1 , 0};
-        int dy[] = {0 , 1 , 0 , -1};
-       
+        queue<pair<int, int>> q;
+        vector<pair<int, int>> move = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        q.push({e[0], e[1]});
 
-        int x = en[0] , y = en[1];
-        
-        queue <Node> q;
-        int min_dist = 1e9;
-        q.push({x , y , 0});
-        vis[x][y] = true;
-        while(!q.empty()){
-            Node cur = q.front();
-            q.pop();
-            int i = cur.x , j = cur.y , dist = cur.dist;
-            if (((i == 0 || i == n - 1) || (j == 0 || j == m - 1)) and arr[i][j] == '.'){
-                if (i == x and j == y){
+        int count = -1;
+        while (!q.empty()){
+            int size = q.size();
+            count++;
 
-                }else{
-                min_dist = dist;
-                break;
+            for (int i = 0; i < size; i++){
+                int ii = q.front().first;
+                int jj = q.front().second;
+                maze[ii][jj] = '+';
+
+                q.pop();
+
+                for (auto it: move){
+                    int x = ii + it.first;
+                    int y = jj + it.second;
+
+                    if ((x >= 0 && x < n) && (y >= 0 && y < m) && (maze[x][y] == '.')){
+                        maze[x][y] = '+';
+                        q.push({x, y});
+                    }
+                }
+                if (ii == e[0] && jj == e[1]){
+                    continue;
+                }
+                if (ii == 0 || ii == n - 1 || jj == 0 || jj == m - 1){
+                    return count;
                 }
             }
-            cout << min_dist << endl;
-            for (int k = 0; k < 4; k++){
-                int ti = i + dx[k] , tj = j + dy[k];
-                if (isValid(arr , vis , ti , tj , m , n)){
-                    vis[ti][tj] = true;
-                    q.push({ti , tj , dist + 1});
-                    
-                }
-            }
-            cout << min_dist << endl;
         }
 
-        if (min_dist == 1e9){
-            return -1;
-        }else return min_dist;
-
-
-
+        return -1;
     }
 };

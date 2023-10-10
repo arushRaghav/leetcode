@@ -1,113 +1,66 @@
 class Solution {
-public:
-    vector<pair<int,int>> border;
+private:
+    vector<vector<int>> directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+
+    void addNodesToQueue(vector<vector<int>>& grid, int m, int n,
+                         int i, int j, int color, queue<pair<int, int>>& q) {
+        if (i < 0 || j < 0 || i >= m || j >= n || grid[i][j] != 1 || grid[i][j] == color) {
+            return;
+        }
+
+        grid[i][j] = color;
+        q.push(make_pair(i, j));
     
-    void prin(vector<pair<int,int>> & a)
-    {
-        for(int i = 0; i< a.size();i++)
-        {
-            cout<<a[i].first<<a[i].second<<"   ";
-        } cout<<'\n';
-    }
-
-    void prinMat(vector<vector<int>>& mat)
-    {
-        for(int i=0;i<mat.size();i++)
-        {
-            for(int j = 0;j<mat.size();j++)
-            {
-                cout<<mat[i][j]<<" ";
-            }
-            cout<<"\n";
+        for (auto& d : directions) {
+            int n_i = i + d[0];
+            int n_j = j + d[1];
+            addNodesToQueue(grid, m, n, n_i, n_j, color, q);
         }
     }
 
-    bool findWater( vector<vector<int>>& grid , int x, int y )
-    {
-        if( (x>0 && grid[x-1][y] == 0) || ( x < grid.size()-1 && grid[x+1][y] == 0 ) || (y>0 && grid[x][y-1] == 0) || ( y < grid.size()-1 && grid[x][y+1] == 0 ))
-            return true;
-        return false;
-    }
-    vector<int> findFirstIsland( vector<vector<int>>& grid )
-    {
-        for(int i = 0;i<grid.size();i++)
-        {
-            for(int j = 0;j<grid.size();j++)
-            {
-                if( grid[i][j] == 1 )
-                { vector<int> a{i,j}; return a; }
-            }
-        }
-        vector<int> a{0,0};
-        return a;
-    }
+public:
+    int shortestBridge(vector<vector<int>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
 
-    void traverse(int x,int y, vector<vector<int>>& grid)
-    {
-        grid[x][y] = 2;
-
-        if(findWater(grid , x,y))
-            border.push_back({x,y});
-        if(x>0 && grid[x-1][y] == 1 ) traverse(x-1,y,grid);
-        if(y>0 && grid[x][y-1] == 1 ) traverse(x,y-1,grid);
-        if(x<grid.size()-1 && grid[x+1][y] == 1 ) traverse(x+1,y,grid);
-        if(y<grid.size()-1 && grid[x][y+1] == 1 ) traverse(x,y+1,grid);
-
-    }
-
-
-    int shortestBridge(vector<vector<int>>& grid) 
-    {
-        vector<int> a;
-        a = findFirstIsland(grid);
-        traverse(a[0],a[1],grid);
-        //now we are getting border successfully and have figured out the first island
-        //now find minimum depth 
-        //prinMat(grid);
-        int ans = 0;
-        while(border.size()!=0)
-        {
-            pair<int,int> i = border[0];                                           
-            border.erase(border.begin());
-            int d = 0; vector<vector<int>> ser = grid;
-            vector<pair<int,int>> curr; vector<pair<int,int>> child;
-            curr.push_back(i);  bool found = false; //cout<<"a";
-            while( curr.size()!=0)
-            {
-                i = curr[0]; curr.erase(curr.begin());
-                int xi = i.first , yi = i.second;
-                ser[xi][yi] = 3;   
-                if( (xi>0 && grid[xi-1][yi] == 1) || ( xi < grid.size()-1 && grid[xi+1][yi] == 1 ) || (yi>0 && grid[xi][yi-1] == 1) || ( yi < grid.size()-1 && grid[xi][yi+1] == 1 ))
-                { found = true;  break;}
-
-                if(xi>0 && ser[xi-1][yi] == 0 ) {child.push_back({xi-1,yi}); ser[xi-1][yi] = 3; }
-                if(xi<ser.size()-1 && ser[xi+1][yi] == 0 ) {child.push_back({xi+1,yi}); ser[xi+1][yi] = 3; }
-                if(yi>0 && ser[xi][yi-1] == 0 ) {child.push_back({xi,yi-1}); ser[xi][yi-1] = 3; }
-                if(yi<ser.size()-1 && ser[xi][yi+1] == 0 ) {child.push_back({xi,yi+1}); ser[xi][yi+1] = 3;}
-
-
-                //cout<<"  curr = "<<curr.size();
-                //cout<<"  child = "<<child.size();
-                if(curr.size() == 0)
-                {
-                    curr = child;
-                    d++;
-                    child.clear();//prinMat(ser); 
-                    //cout<<d<<"a"<<curr.size()<<"\n\n";
+        // 1. Add the nodes of the first island to queue.
+        int color = 2;
+        queue<pair<int, int>> q;
+        for (int i = 0, added = 0; i < m && !added; ++i) {
+            for (int j = 0; j < n && !added; ++j) {
+                if (grid[i][j] == 1) {
+                    addNodesToQueue(grid, m, n, i, j, color, q);
+                    added = 1;
                 }
-                //cout<<"  child af = "<<child.size();
-
-            }
-            
-            if(found)
-            {
-            if(ans == 0)
-            { ans = d; }
-            ans = min(ans,d);
-            if(d == 1) return 1;
             }
         }
-        //cout<<'\n';
-        return ans;
+        
+        // 2. BFS from the queue that contains the nodes from the first island.
+        int level = 0;
+        while (!q.empty()) {
+            // Iterates the nodes in the current level.
+            int level_len = q.size();
+            for (int i = 0; i < level_len; ++i) {
+                pair<int, int> curr = q.front();
+                q.pop();
+
+                for (auto& d : directions) {
+                    int n_i = curr.first + d[0];
+                    int n_j = curr.second + d[1];
+                    if (n_i < 0 || n_j < 0 || n_i >= m || n_j >= n || grid[n_i][n_j] == 2) {
+                        continue;
+                    }
+                    if (grid[n_i][n_j] == 1) {
+                        return level;
+                    }
+
+                    grid[n_i][n_j] = 2;
+                    q.push(make_pair(n_i, n_j));
+                }
+            }
+
+            ++level;
+        }
+        return level;
     }
 };

@@ -15,7 +15,7 @@ public:
         for(int i = 0 ; i <=n ; i++)
             cout<<mp[i][0]<<" "<<mp[i][1]<<" "<<mp[i][2]<<'\n';
     }
-    void make(TreeNode* node , map<int,vector<int>>& mp , int paVal , int max)
+    void make(TreeNode* node , map<int,vector<int>>& mp , int paVal , int& max)
     {
         if(node != NULL)
         {
@@ -58,9 +58,8 @@ public:
 
         vector<int> visiting;
         vector<int> toBeVisited;
-        vector<bool> visited(max+2000 , false);
+        vector<bool> visited(max+1 , false);
         visiting.push_back(target->val);
-
         while(visiting.size()>0)
         {
             int i = visiting[visiting.size()-1];

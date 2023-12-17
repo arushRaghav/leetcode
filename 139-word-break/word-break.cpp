@@ -1,31 +1,44 @@
+struct TrieNode {
+    bool isWord;
+    unordered_map<char, TrieNode*> children;
+    TrieNode() : isWord(false), children(unordered_map<char, TrieNode*>()) {}
+};
+
 class Solution {
 public:
     bool wordBreak(string s, vector<string>& wordDict) {
-        unordered_set<string> words(wordDict.begin(), wordDict.end());
-        queue<int> queue;
-        vector<bool> seen(s.length(), false);
-        queue.push(0);
-        
-        while (!queue.empty()) {
-            int start = queue.front();
-            queue.pop();
-            
-            if (start == s.length()) {
-                return true;
+        TrieNode* root = new TrieNode();
+        for (string word: wordDict) {
+            TrieNode* curr = root;
+            for (char c: word) {
+                if (curr->children.find(c) == curr->children.end()) {
+                    curr->children[c] = new TrieNode();
+                }
+                curr = curr->children[c];
             }
             
-            for (int end = start + 1; end <= s.length(); end++) {
-                if (seen[end]) {
-                    continue;
-                }
-
-                if (words.find(s.substr(start, end - start)) != words.end()) {
-                    queue.push(end);
-                    seen[end] = true;
+            curr->isWord = true;
+        }
+        
+        vector<bool> dp(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            if (i == 0 || dp[i - 1]) {
+                TrieNode* curr = root;
+                for (int j = i; j < s.length(); j++) {
+                    char c = s[j];
+                    if (curr->children.find(c) == curr->children.end()) {
+                        // No words exist
+                        break;
+                    }
+                    
+                    curr = curr->children[c];
+                    if (curr->isWord) {
+                        dp[j] = true;
+                    }
                 }
             }
         }
         
-        return false;
+        return dp[s.length() - 1];
     }
 };

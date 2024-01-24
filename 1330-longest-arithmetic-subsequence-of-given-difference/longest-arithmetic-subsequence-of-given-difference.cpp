@@ -1,28 +1,20 @@
+# define shift 20000
+static auto _ = []() {
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  return nullptr;
+}();
 class Solution {
 public:
     int longestSubsequence(vector<int>& arr, int difference) {
-        map<int,int> lar;
-        int ans = 1;
-        for(int i = 0; i <arr.size() ; i++)
-        {
-            if(lar[arr[i]])
-            {
-                lar[arr[i] + difference ] = lar[arr[i]] + 1;
-                ans = max(lar[arr[i]] , ans);
-            }
-            else
-            {
-                lar[arr[i]+difference] = 2;
-                ans = max(lar[arr[i]] , ans);
-            }
+
+        int res {0};
+        for (const int& num: arr) {
+            st[num + shift] = st[num - difference + shift] + 1;
+            res = max(res, st[num + shift]);
         }
-        // int ans = 1;
-        // for(int i = 0;i<arr.size();i++)
-        // {
-        //     if(lar[arr[i]])
-        // }
-        if(difference == 0)
-            return ans-1;
-        return ans;
+        return res;
     }
+private:
+    int st[2 * shift + 1] {0};
 };

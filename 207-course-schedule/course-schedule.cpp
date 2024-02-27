@@ -1,44 +1,32 @@
 class Solution {
 public:
-    bool cycle(int s,vector<vector<int>> &adj,vector<bool> &visited, vector<bool> &dfsVisited )
-    {
-        visited[s]=true;
-        dfsVisited[s]=true;
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        int n = numCourses;
+        vector<vector<int>> adj(n);
+        vector<int> inDeg(n, 0);
+        for(const auto& pre : prerequisites) {
+            adj[pre[1]].push_back(pre[0]);
+            inDeg[pre[0]]++;
+        }
 
-        for(auto x: adj[s])
-        {
-            if(!visited[x])
-            {
-                if(cycle(x,adj,visited,dfsVisited))
-                {
-                    return true;
+        unordered_set<int> v;
+        deque<int> q;
+        for(int i = 0; i < n; ++i) {
+            if(inDeg[i] == 0) {
+                v.insert(i);
+                q.push_back(i);
+            }
+        }
+        while(!q.empty()) {
+            int cur = q.front(); q.pop_front();
+            for(auto nxt : adj[cur]) {
+                if(--inDeg[nxt] == 0) {
+                    q.push_back(nxt);
+                    v.insert(nxt);
                 }
             }
-            else if(visited[x]&&dfsVisited[x])
-            {
-                return true;
-            }
-        }
-        dfsVisited[s]=false;
-        return false;
-    }
-
-    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
-        vector<vector<int>> adj(numCourses);
-        for(auto it:prerequisites )
-        {
-            adj[it[1]].push_back(it[0]);
         }
 
-        vector<bool> visited(numCourses,false),dfsVisited(numCourses,false);
-        for(int i=0;i<numCourses;i++)
-        {
-            if(!visited[i]&&cycle(i,adj,visited,dfsVisited))
-            {
-                return false;
-            }
-        }
-        return true;
-
+        return (v.size() == n);
     }
 };

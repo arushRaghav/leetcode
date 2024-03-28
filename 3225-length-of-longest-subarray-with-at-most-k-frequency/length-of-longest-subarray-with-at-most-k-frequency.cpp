@@ -1,24 +1,26 @@
+const static auto initialize = [] { std::ios::sync_with_stdio(false); std::cin.tie(nullptr); std::cout.tie(nullptr); return nullptr; }();
 class Solution {
 public:
     int maxSubarrayLength(vector<int>& nums, int k) {
-        int n = nums.size(); 
-        unordered_map<int, int> frequency; 
-        int start = 0;
-        int charsWithFreqOverK = 0;
+        int maxi=0,i=0;
+        unordered_map<int,int> freq;
+        int ans=0;
         
-        for (int end = 0; end < n; end++) {
-            frequency[nums[end]]++;
-            if (frequency[nums[end]] == k + 1) {
-                charsWithFreqOverK++;
-            }
-            if (charsWithFreqOverK > 0) {
-                frequency[nums[start]]--;
-                if (frequency[nums[start]] == k) {
-                    charsWithFreqOverK--;
+        for(int j=0;j<nums.size();j++){
+            freq[nums[j]]++;
+            maxi=max(freq[nums[j]],maxi);
+            
+            if(maxi>k){
+                while(nums[i]!=nums[j]){
+                    freq[nums[i++]]--;
                 }
-                start++;
+                freq[nums[i++]]--;
+                maxi=k;
             }
+            
+            ans=max(ans,j-i+1);
         }
-        return n - start;
+        
+        return ans;
     }
 };
